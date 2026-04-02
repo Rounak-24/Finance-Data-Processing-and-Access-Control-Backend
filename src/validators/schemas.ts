@@ -23,3 +23,23 @@ export const loginUserSchema = z.object({
         password: z.string().min(1, 'Password is required')
     })
 })
+
+export const recordSchema = z.object({
+    body: z.object({
+        amount: z.number({
+            error: (issue) =>
+                issue.input === undefined
+                    ? 'Amount is required'
+                    : 'Amount must be a number',
+        }).positive('Amount must be greater than zero'),
+            type: z.enum(['income', 'expense'], {
+            error: (issue) =>
+                issue.input === undefined
+                    ? 'Type is required'
+                    : "Type must be either 'income' or 'expense'",
+        }),
+        category: z.string().min(1, 'Category is required'),
+        date: z.string().datetime('Invalid date format. Expected ISO 8601 string'),
+        description: z.string().optional()
+    })
+})

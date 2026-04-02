@@ -1,16 +1,7 @@
 import mongoose, { Schema } from "mongoose"
 import bcrypt from "bcrypt"
 import jwt, {type SignOptions, type Secret} from "jsonwebtoken"
-
-export interface IUser {
-    email:string
-    password:string
-    fullname:string
-    role:string
-    isActive:Boolean
-    phone?:string
-    refreshToken?:string
-}
+import type { IUser } from "../types/interfaces.js"
 
 export const userSchema:Schema = new Schema<IUser>({
     fullname:{
@@ -18,6 +9,10 @@ export const userSchema:Schema = new Schema<IUser>({
         required:true
     },
     password:{
+        type:String,
+        required:true
+    },
+    email:{
         type:String,
         required:true
     },
@@ -71,6 +66,7 @@ userSchema.methods.generateRefreshToken = function () {
     const payload = {
         _id:this._id,
         fullname: this.fullname,
+        phone:this.phone,
         email:this.email,
         role:this.role
     }
@@ -86,5 +82,5 @@ userSchema.methods.generateRefreshToken = function () {
     )
 }
 
-const userModel = mongoose.model('User',userSchema)
-export {userModel};
+const user = mongoose.model('user',userSchema)
+export {user};

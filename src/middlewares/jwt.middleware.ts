@@ -1,24 +1,8 @@
 import type { NextFunction, Request, Response } from "express"
 import { ApiError } from "../utils/apiError.js"
-import { userModel } from "../models/user.model.js"
+import { user } from "../models/user.model.js"
 import jwt from "jsonwebtoken"
-import dotenv from "dotenv"
-dotenv.config()
-
-declare global{
-    namespace Express{
-        interface Request {
-            user?:any
-        }
-    }
-} 
-
-interface IDecodedPayload {
-    _id:string,
-    fullname:string,
-    isActive: boolean,
-    role: string
-}
+import type { IAccessDecodedPayload } from "../types/interfaces.js"
 
 export const jwtAuthMiddleware = async (req:Request, res:Response, next:NextFunction)=>{
     try{    
@@ -28,7 +12,7 @@ export const jwtAuthMiddleware = async (req:Request, res:Response, next:NextFunc
         )
 
         const token:string = auth.split(' ')[1]
-        const decoded = jwt.verify(token,process.env.ACCESS_TOKEN_SECRET_KEY as string) as IDecodedPayload
+        const decoded = jwt.verify(token,process.env.ACCESS_TOKEN_SECRET_KEY as string) as IAccessDecodedPayload
 
         if(!decoded.isActive){
             return res.status(403).json(
@@ -36,7 +20,7 @@ export const jwtAuthMiddleware = async (req:Request, res:Response, next:NextFunc
             )
         }
         
-        const User = await userModel.findById(decoded._id).select(
+        const User = await user.findById(decoded._id).select(
             '-refreshToken -password'
         )
 
